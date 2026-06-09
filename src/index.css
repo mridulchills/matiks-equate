@@ -1,0 +1,275 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Matiks Color Palette */
+  --matiks-bg: #1A1A1A;
+  --matiks-surface: #222222;
+  --matiks-surface-light: #2A2A2A;
+  --matiks-surface-lighter: #333333;
+  --matiks-yellow: #FFD700;
+  --matiks-green: #00FF66;
+  --matiks-red: #EF4444;
+  --matiks-text-primary: #FFFFFF;
+  --matiks-text-secondary: #94A3B8;
+  --matiks-border: #333333;
+  --matiks-border-focus: #555555;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--matiks-bg);
+  color: var(--matiks-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.05em;
+  font-weight: 400;
+}
+
+.heading-xl {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 4rem;
+  letter-spacing: 0.05em;
+}
+
+.heading-lg {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.5rem;
+  letter-spacing: 0.05em;
+}
+
+/* Faint Grid Background */
+.matiks-grid-bg {
+  background-color: var(--matiks-bg);
+  background-image: 
+    linear-gradient(var(--matiks-surface) 1px, transparent 1px),
+    linear-gradient(90deg, var(--matiks-surface) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Common UI Components */
+.matiks-pill {
+  border-radius: 9999px;
+  padding: 8px 16px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.matiks-pill-yellow {
+  background-color: transparent;
+  color: var(--matiks-yellow);
+  border: 1px solid var(--matiks-yellow);
+}
+
+.matiks-pill-yellow:hover {
+  background-color: rgba(255, 215, 0, 0.1);
+}
+
+.matiks-pill-yellow-solid {
+  background-color: var(--matiks-yellow);
+  color: #000;
+  border: 1px solid var(--matiks-yellow);
+}
+
+.matiks-pill-yellow-solid:hover {
+  background-color: #e6c200;
+}
+
+.matiks-card {
+  background-color: var(--matiks-surface);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid var(--matiks-border);
+}
+
+.matiks-input {
+  background-color: var(--matiks-surface-light);
+  border: 1px solid var(--matiks-border);
+  color: var(--matiks-text-primary);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  width: 100%;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.matiks-input:focus {
+  border-color: var(--matiks-yellow);
+}
+
+.matiks-input::placeholder {
+  color: #666;
+}
+
+/* Bottom Sheet */
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--matiks-surface);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 24px;
+  border-top: 1px solid var(--matiks-border);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
+}
+
+.bottom-sheet.open {
+  transform: translateY(0);
+}
+
+.bottom-sheet-handle {
+  width: 40px;
+  height: 4px;
+  background-color: var(--matiks-yellow);
+  border-radius: 2px;
+  margin: 0 auto 20px auto;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.matiks-equate-bg {
+  background-color: var(--matiks-bg);
+  background-image: 
+    linear-gradient(var(--matiks-surface) 1px, transparent 1px),
+    linear-gradient(90deg, var(--matiks-surface) 1px, transparent 1px);
+  background-size: 40px 40px;
+  /* Radial fade out for the grid lines - vanish at point */
+  mask-image: radial-gradient(circle at center, black 0%, transparent 60%);
+  -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 60%);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.matiks-elevated {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--matiks-border);
+}
+
+.matiks-btn-3d {
+  box-shadow: 0 3px 0 #151516;
+  border: 1px solid var(--matiks-border);
+  transition: all 0.1s ease;
+  background-color: var(--matiks-surface);
+}
+
+.matiks-btn-3d:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.matiks-tile, .matiks-slot {
+  background-color: #1A1A1A;
+  border: 1px solid #2C2C2C;
+  border-radius: 14px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.matiks-slot {
+  border: 2px dashed #2C2C2C;
+  color: var(--matiks-yellow);
+  background-color: transparent;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.matiks-slot.filled {
+  border: none;
+  background-color: var(--matiks-surface);
+}
+
+.matiks-slot.is-over {
+  border-color: var(--matiks-yellow);
+}
+
+@media (max-width: 500px) {
+  .matiks-tile, .matiks-slot {
+    width: 42px;
+    height: 42px;
+    font-size: 1.75rem;
+    border-radius: 10px;
+  }
+}
+
+/* Utility Classes */
+.text-yellow { color: var(--matiks-yellow); }
+.text-green { color: var(--matiks-green); }
+.text-red { color: var(--matiks-red); }
+.text-secondary { color: var(--matiks-text-secondary); }
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cursor-grab { cursor: grab; }
+.cursor-grabbing { cursor: grabbing; }
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--matiks-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--matiks-surface-lighter);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--matiks-border-focus);
+}
