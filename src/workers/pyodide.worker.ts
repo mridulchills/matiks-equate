@@ -2,14 +2,15 @@
 
 declare const self: DedicatedWorkerGlobalScope;
 
-// Use ES module import for Pyodide to support Vite's module workers in dev
-// @ts-ignore - TS cannot resolve URL modules natively
-import { loadPyodide } from 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.mjs';
-
 let pyodideReadyPromise: Promise<any>;
 let pyodideInstance: any = null;
 
 async function initPyodide() {
+  // Use dynamic import so Vite/Rollup doesn't try to bundle the external CDN URL during production build
+  // @ts-ignore - TS cannot resolve URL modules natively
+  const pyodideModule = await import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.mjs');
+  const loadPyodide = pyodideModule.loadPyodide;
+
   // Load Pyodide
   const pyodide = await loadPyodide({
     indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/',
