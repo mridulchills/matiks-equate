@@ -6,8 +6,8 @@ import { RuleSheet } from './components/RuleSheet';
 import { PreviewMode } from './components/PreviewMode';
 import { GlobalSettings } from './components/GlobalSettings';
 import { Settings as SettingsIcon } from 'lucide-react';
-import { 
-  DndContext, 
+import {
+  DndContext,
   closestCenter,
   KeyboardSensor,
   PointerSensor,
@@ -16,7 +16,7 @@ import {
   DragOverlay
 } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
-import { 
+import {
   arrayMove,
   sortableKeyboardCoordinates
 } from '@dnd-kit/sortable';
@@ -31,9 +31,9 @@ function App() {
     game_id: 'ugc_test1',
     creator: { user_id: 'u_123', username: 'mridul_cm' },
     meta: { name: 'Make 24', category: 'arithmetic', difficulty: 'hard', visibility: 'public' },
-    config: { 
-      rounds: 5, 
-      time_limit: { type: 'per_question', seconds: 30 }, 
+    config: {
+      rounds: 5,
+      time_limit: { type: 'per_question', seconds: 30 },
       layout: {
         components: [
           { id: 'A', type: 'number_tile', position: 0 },
@@ -59,10 +59,11 @@ function App() {
       }
     }
   });
-  
+
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
   const [activeDragType, setActiveDragType] = useState<string | null>(null);
   const [isGlobalSettingsOpen, setIsGlobalSettingsOpen] = useState(false);
+  const [showRules, setShowRules] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -78,14 +79,14 @@ function App() {
   const handleDragEnd = (event: DragEndEvent) => {
     setActiveDragType(null);
     const { active, over } = event;
-    
+
     if (!over) return;
 
     if (String(active.id).startsWith('tray-')) {
       // Dropping a new component from the tray
       if (over.id === 'canvas-droppable' || game.config.layout.components.find(c => c.id === over.id)) {
         const type = String(active.id).replace('tray-', '') as ComponentType;
-        
+
         setGame(prev => {
           const newGame = JSON.parse(JSON.stringify(prev)) as MatiksGame;
           let newId = Math.random().toString(36).substring(7);
@@ -125,7 +126,7 @@ function App() {
         setGame((prev) => {
           const oldIndex = prev.config.layout.components.findIndex((c) => c.id === active.id);
           const newIndex = prev.config.layout.components.findIndex((c) => c.id === over.id);
-          
+
           return {
             ...prev,
             config: {
@@ -160,17 +161,141 @@ function App() {
 
   if (appState === 'menu') {
     return (
-      <div className="min-h-screen matiks-grid-bg flex-center" style={{ minHeight: '100vh', flexDirection: 'column', gap: '48px', backgroundColor: 'var(--matiks-bg)' }}>
-        <h1 className="heading-xl text-yellow" style={{ fontSize: '5rem', letterSpacing: '0.15em', textShadow: '0 0 20px rgba(234, 179, 8, 0.3)' }}>MATIKS</h1>
-        <div style={{ display: 'flex', gap: '32px' }}>
+      <div style={{
+        height: '100%',
+        backgroundColor: '#111',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        padding: '24px'
+      }}>
+        {/* Top Bar */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '60px' }}>
           <button 
-            className="matiks-pill matiks-pill-yellow-solid" 
-            style={{ padding: '24px 48px', fontSize: '1.5rem', boxShadow: '0 8px 24px rgba(234, 179, 8, 0.4)' }}
-            onClick={() => setAppState('equate')}
-          >
-            Play Equate
+            onClick={() => setShowRules(true)}
+            style={{ 
+            padding: '12px 16px', 
+            borderRadius: '12px', 
+            backgroundColor: '#1a1a1a', 
+            border: '1px solid #333', 
+            color: '#fff', 
+            fontSize: '0.875rem',
+            fontFamily: 'Inter',
+            fontWeight: 600,
+            cursor: 'pointer',
+            letterSpacing: '0.05em'
+          }}>
+            HOW TO PLAY?
           </button>
         </div>
+
+        {/* Content */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', paddingLeft: '8px' }}>
+          {/* Tags */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+            <div style={{
+              backgroundColor: '#1a1a1a',
+              color: 'var(--matiks-yellow)',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              fontFamily: 'Inter',
+              letterSpacing: '0.05em'
+            }}>MATH</div>
+            <div style={{
+              backgroundColor: '#333',
+              color: '#d1d5db',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              fontFamily: 'Inter',
+              letterSpacing: '0.05em'
+            }}>3 MIN ROUND</div>
+          </div>
+
+          {/* Title */}
+          <h1 style={{
+            fontFamily: 'Bebas Neue',
+            fontSize: '5.5rem',
+            color: '#fff',
+            lineHeight: 0.9,
+            margin: '0 0 32px 0',
+            letterSpacing: '0.02em'
+          }}>
+            EQUATE<br />RACE
+          </h1>
+
+          {/* Subtitle */}
+          <p style={{
+            color: '#6b7280',
+            fontFamily: 'Inter',
+            fontSize: '0.875rem',
+            fontWeight: 700,
+            letterSpacing: '0.05em'
+          }}>
+            RACE TO SOLVE THE MOST IN 3 MINUTES
+          </p>
+        </div>
+
+        {/* Bottom Button */}
+        <div style={{ marginBottom: '16px' }}>
+          <button
+            onClick={() => setAppState('equate')}
+            style={{
+              width: '100%',
+              backgroundColor: 'var(--matiks-yellow)',
+              color: '#000',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '20px',
+              fontSize: '1.125rem',
+              fontFamily: 'Inter',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 6px 0 #b39700',
+              transition: 'transform 0.1s, box-shadow 0.1s'
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = 'translateY(4px)';
+              e.currentTarget.style.boxShadow = '0 2px 0 #b39700';
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 6px 0 #b39700';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 6px 0 #b39700';
+            }}
+          >
+            PLAY A ROUND
+          </button>
+        </div>
+
+        {/* Rules Bottom Sheet */}
+        <div className={`bottom-sheet ${showRules ? 'open' : ''}`}>
+          <div className="bottom-sheet-handle" onClick={() => setShowRules(false)}></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <h3 style={{ margin: 0, fontSize: '1.5rem', color: '#fff' }}>HOW TO PLAY</h3>
+            <button onClick={() => setShowRules(false)} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <ul style={{ color: '#9ca3af', fontFamily: 'Inter', fontSize: '1rem', lineHeight: 1.6, margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <li>Place operators (+, -, ×, ÷) into the slots to equal the target number.</li>
+            <li>You can drag the operators, or tap to select and place them.</li>
+            <li>Score as many points as possible before the 3-minute timer runs out!</li>
+          </ul>
+        </div>
+        {/* Overlay */}
+        {showRules && (
+          <div 
+            onClick={() => setShowRules(false)}
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 40 }}
+          />
+        )}
       </div>
     );
   }
@@ -185,7 +310,7 @@ function App() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', backgroundColor: 'var(--matiks-surface)', borderBottom: '1px solid var(--matiks-border)', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <button className="matiks-card" style={{ padding: '8px', border: 'none', cursor: 'pointer' }} onClick={() => setAppState('menu')}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
           </button>
           <h2 className="heading-lg" style={{ margin: 0, fontSize: '2rem' }}>{game.meta.name}</h2>
           {mode === 'build' && (
@@ -194,7 +319,7 @@ function App() {
             </button>
           )}
         </div>
-        
+
         <div style={{ display: 'flex', gap: '12px' }}>
           {mode === 'build' && (
             <button className="matiks-pill" style={{ background: 'transparent', color: 'var(--matiks-text-secondary)', border: '1px solid var(--matiks-border)' }} onClick={handleExportJSON}>
@@ -220,8 +345,8 @@ function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               <div style={{ flex: 1, overflow: 'auto', padding: '24px' }}>
                 <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                  <Canvas 
-                    components={game.config.layout.components} 
+                  <Canvas
+                    components={game.config.layout.components}
                     selectedId={selectedComponentId}
                     onSelect={setSelectedComponentId}
                     onDelete={handleDelete}
@@ -242,7 +367,7 @@ function App() {
               ) : null}
             </DragOverlay>
 
-            <GlobalSettings 
+            <GlobalSettings
               game={game}
               isOpen={isGlobalSettingsOpen}
               onClose={() => setIsGlobalSettingsOpen(false)}

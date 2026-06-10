@@ -24,7 +24,7 @@ interface Puzzle {
   hint: string[];
 }
 
-const DraggableOperator = ({ op, isTray = false }: { op: string, isTray?: boolean }) => {
+const DraggableOperator = ({ op, isTray = false, isSelected = false, onClick }: { op: string, isTray?: boolean, isSelected?: boolean, onClick?: () => void }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: isTray ? `tray-${op}` : `drag-${op}-${Math.random()}`,
     data: { op }
@@ -35,17 +35,19 @@ const DraggableOperator = ({ op, isTray = false }: { op: string, isTray?: boolea
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      onClick={onClick}
       className="matiks-tile matiks-elevated"
       style={{
         color: 'var(--matiks-yellow)',
-        borderColor: 'var(--matiks-yellow)',
+        borderColor: isSelected ? '#fff' : 'var(--matiks-yellow)',
         backgroundColor: 'var(--matiks-surface)',
         cursor: 'grab',
         opacity: isDragging ? 0.5 : 1,
         touchAction: 'none',
         WebkitUserSelect: 'none',
         userSelect: 'none',
-        zIndex: isDragging ? 100 : 1
+        zIndex: isDragging ? 100 : 1,
+        boxShadow: isSelected ? '0 0 12px rgba(255,255,255,0.5)' : undefined
       }}
     >
       {op}
@@ -53,7 +55,7 @@ const DraggableOperator = ({ op, isTray = false }: { op: string, isTray?: boolea
   );
 };
 
-const DroppableSlot = ({ id, op, onRemove }: { id: string, op: string | null, onRemove: () => void }) => {
+const DroppableSlot = ({ id, op, onRemove, isSelected = false, onClick }: { id: string, op: string | null, onRemove: () => void, isSelected?: boolean, onClick?: () => void }) => {
   const { isOver, setNodeRef } = useDroppable({ id });
 
   let classNames = "matiks-slot";
@@ -63,13 +65,15 @@ const DroppableSlot = ({ id, op, onRemove }: { id: string, op: string | null, on
   return (
     <div
       ref={setNodeRef}
-      onClick={op ? onRemove : undefined}
+      onClick={onClick || (op ? onRemove : undefined)}
       className={classNames}
       style={{
-        cursor: op ? 'pointer' : 'default',
+        cursor: 'pointer',
         margin: '0 4px',
         WebkitUserSelect: 'none',
         userSelect: 'none',
+        borderColor: isSelected ? '#fff' : undefined,
+        boxShadow: isSelected ? '0 0 12px rgba(255,255,255,0.3)' : undefined
       }}
     >
       {op || ''}
@@ -91,6 +95,9 @@ export const EquateGame: React.FC<EquateGameProps> = ({ onExit }) => {
   
   const [timeLeft, setTimeLeft] = useState<number>(GAME_DURATION_SECONDS);
   const [score, setScore] = useState<number>(0);
+
+  const [selectedOp, setSelectedOp] = useState<string | null>(null);
+  const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -197,6 +204,41 @@ export const EquateGame: React.FC<EquateGameProps> = ({ onExit }) => {
       newSlots[index] = null;
       return newSlots;
     });
+    if (selectedSlotIndex === index) setSelectedSlotIndex(null);
+  };
+
+  const handleTrayOpClick = (op: string) => {
+    if (gameState === 'won' || gameState === 'gameover') return;
+    
+    if (selectedSlotIndex !== null) {
+      setSlots(prev => {
+        const newSlots = [...prev];
+        newSlots[selectedSlotIndex] = op;
+        return newSlots;
+      });
+      setSelectedSlotIndex(null);
+      setSelectedOp(null);
+    } else {
+      setSelectedOp(prev => prev === op ? null : op);
+    }
+  };
+
+  const handleSlotClick = (index: number) => {
+    if (gameState === 'won' || gameState === 'gameover') return;
+
+    if (slots[index]) {
+      handleRemoveOperator(index);
+    } else if (selectedOp !== null) {
+      setSlots(prev => {
+        const newSlots = [...prev];
+        newSlots[index] = selectedOp;
+        return newSlots;
+      });
+      setSelectedOp(null);
+      setSelectedSlotIndex(null);
+    } else {
+      setSelectedSlotIndex(prev => prev === index ? null : index);
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -340,7 +382,13 @@ export const EquateGame: React.FC<EquateGameProps> = ({ onExit }) => {
                     {num}
                   </div>
                   {i < 3 && (
-                    <DroppableSlot id={`slot-${i}`} op={slots[i]} onRemove={() => handleRemoveOperator(i)} />
+                    <DroppableSlot 
+                      id={`slot-${i}`} 
+                      op={slots[i]} 
+                      onRemove={() => handleRemoveOperator(i)}
+                      isSelected={selectedSlotIndex === i}
+                      onClick={() => handleSlotClick(i)}
+                    />
                   )}
                 </React.Fragment>
               ))}
@@ -360,24 +408,22 @@ export const EquateGame: React.FC<EquateGameProps> = ({ onExit }) => {
             {/* Operator Tray */}
             <div style={{ display: 'flex', gap: '16px', marginTop: '6vh' }}>
               {['+', '-', '×', '÷'].map(op => (
-                <DraggableOperator key={op} op={op} isTray />
+                <DraggableOperator 
+                  key={op} 
+                  op={op} 
+                  isTray 
+                  isSelected={selectedOp === op}
+                  onClick={() => handleTrayOpClick(op)}
+                />
               ))}
             </div>
 
             <DragOverlay dropAnimation={null}>
               {activeDragOp ? (
-                <div style={{
-                  width: '60px',
-                  height: '60px',
-                  fontSize: '2rem',
-                  fontWeight: 'bold',
+                <div className="matiks-tile matiks-elevated" style={{
                   color: 'var(--matiks-yellow)',
-                  border: '2px solid var(--matiks-yellow)',
+                  borderColor: 'var(--matiks-yellow)',
                   backgroundColor: 'var(--matiks-surface)',
-                  borderRadius: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                   boxShadow: '0 8px 16px rgba(234, 179, 8, 0.3)'
                 }}>
                   {activeDragOp}

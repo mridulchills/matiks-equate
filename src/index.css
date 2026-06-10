@@ -23,11 +23,39 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--matiks-bg);
+  min-height: 100vh;
+  background-color: #000000; /* Global Background */
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Center vertically for floating phone look */
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   color: var(--matiks-text-primary);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden; /* Prevent body scrolling */
+}
+
+#root {
+  width: 100%;
+  max-width: 400px; /* Mobile Container max width */
+  height: 100vh;
+  max-height: 850px; /* Fixed height for true floating phone look */
+  position: relative;
+  background-color: #0D0D0D; /* Official Matiks dark background */
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8); /* Soft drop shadow */
+  border: 1px solid #2C2C2C; /* Subtle border for desktop polish */
+  border-radius: 24px; /* Phone-like rounded corners */
+  overflow: hidden; /* Hide main scrollbars */
+  margin: 0 auto; /* Center horizontally */
+  padding: 0;
+}
+
+/* Remove floating phone styles on actual mobile devices */
+@media (max-width: 500px), (max-height: 850px) {
+  #root {
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+  }
 }
 
 /* Typography */
@@ -207,13 +235,13 @@ h1, h2, h3, h4, h5, h6 {
 .matiks-tile, .matiks-slot {
   background-color: #1A1A1A;
   border: 1px solid #2C2C2C;
-  border-radius: 14px;
-  width: 60px;
-  height: 60px;
+  border-radius: 12px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-weight: bold;
   color: #fff;
 }
@@ -232,15 +260,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .matiks-slot.is-over {
   border-color: var(--matiks-yellow);
-}
-
-@media (max-width: 500px) {
-  .matiks-tile, .matiks-slot {
-    width: 42px;
-    height: 42px;
-    font-size: 1.75rem;
-    border-radius: 10px;
-  }
 }
 
 /* Utility Classes */
