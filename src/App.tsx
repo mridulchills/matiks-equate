@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import MatiksSplash from './components/MatiksSplash';
 import type { MatiksGame, GameComponent, ComponentType } from './types';
 import { Canvas } from './components/Canvas';
 import { ComponentTray } from './components/ComponentTray';
@@ -25,6 +26,7 @@ import './index.css';
 import { EquateGame } from './components/equate/EquateGame';
 
 function App() {
+  const [splashDone, setSplashDone] = useState(false);
   const [appState, setAppState] = useState<'menu' | 'builder' | 'equate'>('menu');
   const [mode, setMode] = useState<'build' | 'preview'>('build');
   const [game, setGame] = useState<MatiksGame>({
@@ -158,6 +160,10 @@ function App() {
     alert('Game Config exported to console!\n\n' + jsonStr.slice(0, 200) + '...');
     console.log(jsonStr);
   };
+
+  if (!splashDone) {
+    return <MatiksSplash onComplete={() => setSplashDone(true)} />;
+  }
 
   if (appState === 'menu') {
     return (
